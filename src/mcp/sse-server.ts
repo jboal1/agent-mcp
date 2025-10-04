@@ -13,7 +13,7 @@ import {
   Tool
 } from "@modelcontextprotocol/sdk/types.js";
 
-const PORT = process.env.MCP_SSE_PORT || 3001;
+const PORT = process.env.PORT || process.env.MCP_SSE_PORT || 3002;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY!;
 const yaml = require('js-yaml');
 
