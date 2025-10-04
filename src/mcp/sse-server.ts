@@ -259,7 +259,8 @@ app.get('/health', (req, res) => {
 
 // Install script endpoint
 app.get('/install', (req, res) => {
-  const installScript = fs.readFileSync(path.join(__dirname, '../../install.sh'), 'utf8');
+  const installPath = path.join(__dirname, '../install.sh');
+  const installScript = fs.readFileSync(installPath, 'utf8');
   res.setHeader('Content-Type', 'text/plain');
   res.send(installScript);
 });
