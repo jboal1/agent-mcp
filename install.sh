@@ -74,10 +74,29 @@ mkdir -p "$COMMANDS_DIR"
 cat > "$COMMANDS_DIR/react-expert.md" << 'CMDEOF'
 ---
 description: Get expert React/TypeScript advice from the react-expert agent
-argument-hint: <your question>
+argument-hint: <your question or 'examples'>
 ---
 
-Use the mcp__agent-mcp__agent_run tool to call the react-expert agent with this request:
+If the user typed "examples" or "help", show these examples instead of calling the agent:
+
+**React Expert Examples:**
+
+1. **Component Creation**
+   `/react-expert Create a reusable Button component with TypeScript props for variant and size`
+
+2. **Hook Usage**
+   `/react-expert How do I use useCallback to optimize this component's performance?`
+
+3. **State Management**
+   `/react-expert Best practices for managing form state with React Hook Form`
+
+4. **Testing**
+   `/react-expert Write tests for a custom useAuth hook using React Testing Library`
+
+5. **Architecture**
+   `/react-expert How should I structure a large React app with feature-based folders?`
+
+Otherwise, use the mcp__agent-mcp__agent_run tool to call the react-expert agent with this request:
 
 **Agent ID:** react-expert
 **User Input:** $ARGUMENTS
@@ -91,10 +110,29 @@ success "  ✓ /react-expert"
 cat > "$COMMANDS_DIR/sql-debug.md" << 'CMDEOF'
 ---
 description: Debug and optimize SQL queries with the sql-debugger agent
-argument-hint: <your SQL query>
+argument-hint: <your SQL query or 'examples'>
 ---
 
-Use the mcp__agent-mcp__agent_run tool to call the sql-debugger agent with this query:
+If the user typed "examples" or "help", show these examples instead of calling the agent:
+
+**SQL Debugger Examples:**
+
+1. **Query Optimization**
+   `/sql-debug SELECT * FROM users WHERE created_at > NOW() - INTERVAL 30 DAY`
+
+2. **Index Suggestions**
+   `/sql-debug SELECT u.name, COUNT(o.id) FROM users u LEFT JOIN orders o ON u.id = o.user_id GROUP BY u.id`
+
+3. **Performance Issues**
+   `/sql-debug Why is this query slow: SELECT * FROM posts WHERE title LIKE '%search%'`
+
+4. **Join Optimization**
+   `/sql-debug SELECT * FROM orders o JOIN users u ON o.user_id = u.id WHERE u.status = 'active'`
+
+5. **Complex Queries**
+   `/sql-debug Optimize this subquery: SELECT * FROM products WHERE id IN (SELECT product_id FROM sales WHERE date > '2024-01-01')`
+
+Otherwise, use the mcp__agent-mcp__agent_run tool to call the sql-debugger agent with this query:
 
 **Agent ID:** sql-debugger
 **User Input:** $ARGUMENTS
@@ -103,6 +141,144 @@ Use the mcp__agent-mcp__agent_run tool to call the sql-debugger agent with this 
 Please analyze the query and display the agent's recommendations clearly.
 CMDEOF
 success "  ✓ /sql-debug"
+
+# Git Helper Command
+cat > "$COMMANDS_DIR/git-helper.md" << 'CMDEOF'
+---
+description: Get expert Git help with commands, workflows, and troubleshooting
+argument-hint: <your git question or 'examples'>
+---
+
+If the user typed "examples" or "help", show these examples instead of calling the agent:
+
+**Git Helper Examples:**
+
+1. **Undo Last Commit**
+   `/git-helper I committed to the wrong branch, how do I undo it?`
+
+2. **Merge Conflicts**
+   `/git-helper How do I resolve merge conflicts in package.json?`
+
+3. **Rebase vs Merge**
+   `/git-helper Should I rebase or merge my feature branch?`
+
+4. **Recover Deleted Branch**
+   `/git-helper I accidentally deleted a branch, how do I recover it?`
+
+5. **Clean Up History**
+   `/git-helper How do I squash my last 5 commits into one?`
+
+Otherwise, use the mcp__agent-mcp__agent_run tool to call the git-helper agent with this request:
+
+**Agent ID:** git-helper
+**User Input:** $ARGUMENTS
+**Temperature:** 0.2
+
+Please display the agent's response clearly and helpfully.
+CMDEOF
+success "  ✓ /git-helper"
+
+# Debug This Command
+cat > "$COMMANDS_DIR/debug-this.md" << 'CMDEOF'
+---
+description: Analyze error messages and get debugging help
+argument-hint: <paste your error message or 'examples'>
+---
+
+If the user typed "examples" or "help", show these examples instead of calling the agent:
+
+**Debug This Examples:**
+
+1. **Runtime Error**
+   `/debug-this TypeError: Cannot read property 'map' of undefined at App.tsx:45`
+
+2. **Import Error**
+   `/debug-this Module not found: Can't resolve 'react-router-dom'`
+
+3. **Network Error**
+   `/debug-this CORS error: No 'Access-Control-Allow-Origin' header present`
+
+4. **Database Error**
+   `/debug-this PostgreSQL error: column "user_id" does not exist`
+
+5. **Build Error**
+   `/debug-this TS2345: Argument of type 'string' is not assignable to parameter of type 'number'`
+
+Otherwise, use the mcp__agent-mcp__agent_run tool to call the debug-this agent with this request:
+
+**Agent ID:** debug-this
+**User Input:** $ARGUMENTS
+**Temperature:** 0.2
+
+Please display the agent's response clearly and helpfully.
+CMDEOF
+success "  ✓ /debug-this"
+
+# Test Generator Command
+cat > "$COMMANDS_DIR/test-gen.md" << 'CMDEOF'
+---
+description: Generate comprehensive tests for your code
+argument-hint: <describe what to test or 'examples'>
+---
+
+If the user typed "examples" or "help", show these examples instead of calling the agent:
+
+**Test Generator Examples:**
+
+1. **Unit Test**
+   `/test-gen Write Jest tests for a function that validates email addresses`
+
+2. **Component Test**
+   `/test-gen Generate React Testing Library tests for a LoginForm component`
+
+3. **API Test**
+   `/test-gen Create integration tests for a POST /users endpoint`
+
+4. **Edge Cases**
+   `/test-gen What edge cases should I test for a shopping cart calculation function?`
+
+5. **Mock Data**
+   `/test-gen Generate test fixtures for a User model with roles and permissions`
+
+Otherwise, use the mcp__agent-mcp__agent_run tool to call the test-gen agent with this request:
+
+**Agent ID:** test-gen
+**User Input:** $ARGUMENTS
+**Temperature:** 0.2
+
+Please display the agent's response clearly and helpfully.
+CMDEOF
+success "  ✓ /test-gen"
+
+# Help Command
+cat > "$COMMANDS_DIR/help.md" << 'CMDEOF'
+---
+description: Show all available Agent MCP agents with examples
+---
+
+Use the mcp__agent-mcp__agent_list tool to get all available agents.
+
+Then display them in a helpful format like this:
+
+**Available AI Agents:**
+
+For each agent, show:
+- Agent name with slash command
+- Description
+- 2-3 example use cases
+- How to use it
+
+Make it visually appealing and easy to scan.
+
+At the end, remind users they can also use:
+- `/react-expert examples` - See React-specific examples
+- `/sql-debug examples` - See SQL-specific examples
+- `/git-helper examples` - See Git-specific examples
+- `/debug-this examples` - See debugging examples
+- `/test-gen examples` - See testing examples
+- `/agents` - Quick list of all agents
+CMDEOF
+success "  ✓ /help"
 
 # Agents List Command
 cat > "$COMMANDS_DIR/agents.md" << 'CMDEOF'
@@ -134,14 +310,19 @@ echo ""
 echo "1. ${YELLOW}Restart Claude Code${NC} (important!)"
 echo ""
 echo "2. Use these slash commands:"
-echo -e "   ${BLUE}/react-expert${NC} <question>  - Get React/TypeScript advice"
-echo -e "   ${BLUE}/sql-debug${NC} <query>       - Debug and optimize SQL"
-echo -e "   ${BLUE}/agents${NC}                  - List all available agents"
+echo -e "   ${BLUE}/help${NC}                    - Show all agents with examples"
+echo -e "   ${BLUE}/react-expert${NC} <question> - React/TypeScript expert"
+echo -e "   ${BLUE}/sql-debug${NC} <query>      - SQL query optimizer"
+echo -e "   ${BLUE}/git-helper${NC} <question>  - Git commands & workflows"
+echo -e "   ${BLUE}/debug-this${NC} <error>     - Error message analyzer"
+echo -e "   ${BLUE}/test-gen${NC} <description> - Test generator"
+echo -e "   ${BLUE}/agents${NC}                  - Quick list of all agents"
 echo ""
-echo "3. Examples:"
-echo -e "   ${BLUE}/react-expert${NC} Create a Button component with TypeScript"
-echo -e "   ${BLUE}/sql-debug${NC} SELECT * FROM users WHERE created_at > NOW()"
-echo -e "   ${BLUE}/agents${NC}"
+echo "3. Try it:"
+echo -e "   ${BLUE}/help${NC}                                           - See everything"
+echo -e "   ${BLUE}/react-expert examples${NC}                          - See React examples"
+echo -e "   ${BLUE}/git-helper${NC} How do I undo my last commit?"
+echo -e "   ${BLUE}/debug-this${NC} TypeError: Cannot read property 'map' of undefined"
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
