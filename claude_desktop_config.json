@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "agent-mcp": {
+      "command": "node",
+      "args": [
+        "/Users/jaredboal/agent-mcp/dist/mcp/server.js"
+      ],
+      "env": {
+        "ANTHROPIC_API_KEY": "your_key_here"
+      }
+    }
+  }
+}
