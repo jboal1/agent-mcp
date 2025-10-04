@@ -5,12 +5,7 @@
 ## 🚀 One-Line Install
 
 ```bash
-bash <(curl -fsSL https://julien-semimanneristic-eugene.ngrok-free.dev/install)
-```
-
-Or use your own domain:
-```bash
-bash <(curl -fsSL https://agent-mcp.dev/install.sh)
+bash <(curl -fsSL https://agent-mcp-production.up.railway.app/install)
 ```
 
 ## ✨ What You Get
