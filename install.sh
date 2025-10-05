@@ -328,6 +328,169 @@ Use the mcp__agent-mcp__agent_list tool to display all available agents in a nic
 CMDEOF
 success "  ✓ /agents"
 
+# Build Feature Workflow Command
+cat > "$COMMANDS_DIR/build-feature.md" << 'CMDEOF'
+---
+description: Build a complete feature with multiple agents (design → code → test → git)
+argument-hint: <feature description>
+---
+
+You are going to orchestrate multiple AI agents to build a complete feature. Follow this workflow:
+
+**Feature to Build:** $ARGUMENTS
+
+## Step 1: Design the Architecture
+Use the mcp__agent-mcp__agent_run tool to call the react-expert agent:
+- **Agent ID:** react-expert
+- **User Input:** "Design the architecture and component structure for: $ARGUMENTS. What components do we need? How should state flow? What's the folder structure?"
+- **Temperature:** 0.3
+
+Wait for the response, then proceed to Step 2.
+
+## Step 2: Generate the Implementation
+Use the mcp__agent-mcp__agent_run tool to call the react-expert agent again:
+- **Agent ID:** react-expert
+- **User Input:** "Based on the architecture we just discussed, implement the main components for: $ARGUMENTS. Include TypeScript types and proper error handling."
+- **Temperature:** 0.2
+
+Wait for the response, then proceed to Step 3.
+
+## Step 3: Generate Tests
+Use the mcp__agent-mcp__agent_run tool to call the test-gen agent:
+- **Agent ID:** test-gen
+- **User Input:** "Generate comprehensive tests for the feature we just built: $ARGUMENTS. Include unit tests and integration tests."
+- **Temperature:** 0.2
+
+Wait for the response, then proceed to Step 4.
+
+## Step 4: Git Workflow
+Use the mcp__agent-mcp__agent_run tool to call the git-helper agent:
+- **Agent ID:** git-helper
+- **User Input:** "What's the best Git workflow for committing this feature: $ARGUMENTS? Suggest branch name, commit structure, and PR description."
+- **Temperature:** 0.2
+
+## Final Summary
+After all agents complete, provide:
+1. Summary of what was built
+2. Files that should be created
+3. Commands to run
+4. Next steps
+
+Present everything in a clean, actionable format.
+CMDEOF
+success "  ✓ /build-feature"
+
+# Debug Flow Workflow Command
+cat > "$COMMANDS_DIR/debug-flow.md" << 'CMDEOF'
+---
+description: Debug an issue with multiple agents (analyze → fix → test → verify)
+argument-hint: <error or issue description>
+---
+
+You are going to orchestrate multiple AI agents to debug and fix an issue. Follow this workflow:
+
+**Issue to Debug:** $ARGUMENTS
+
+## Step 1: Analyze the Error
+Use the mcp__agent-mcp__agent_run tool to call the debug-this agent:
+- **Agent ID:** debug-this
+- **User Input:** "Analyze this error and identify the root cause: $ARGUMENTS. What's causing this and what are the likely fixes?"
+- **Temperature:** 0.2
+
+Wait for the response, then proceed to Step 2.
+
+## Step 2: Implement the Fix
+Use the mcp__agent-mcp__agent_run tool to call the react-expert agent:
+- **Agent ID:** react-expert
+- **User Input:** "Based on the error analysis, implement a fix for: $ARGUMENTS. Show the corrected code with explanations."
+- **Temperature:** 0.2
+
+Wait for the response, then proceed to Step 3.
+
+## Step 3: Add Tests to Prevent Regression
+Use the mcp__agent-mcp__agent_run tool to call the test-gen agent:
+- **Agent ID:** test-gen
+- **User Input:** "Generate tests to catch this bug and prevent regression: $ARGUMENTS"
+- **Temperature:** 0.2
+
+Wait for the response, then proceed to Step 4.
+
+## Step 4: Git Commit Strategy
+Use the mcp__agent-mcp__agent_run tool to call the git-helper agent:
+- **Agent ID:** git-helper
+- **User Input:** "How should I commit this bug fix: $ARGUMENTS? Suggest commit message and any git best practices."
+- **Temperature:** 0.2
+
+## Final Summary
+After all agents complete, provide:
+1. Root cause of the issue
+2. The fix implemented
+3. Tests added
+4. Git workflow
+5. How to verify the fix
+
+Present everything in a clean, actionable format.
+CMDEOF
+success "  ✓ /debug-flow"
+
+# Code Review Workflow Command
+cat > "$COMMANDS_DIR/code-review.md" << 'CMDEOF'
+---
+description: Comprehensive code review with multiple specialized agents
+argument-hint: <code or file to review>
+---
+
+You are going to orchestrate multiple AI agents to perform a thorough code review. Follow this workflow:
+
+**Code to Review:** $ARGUMENTS
+
+## Step 1: React/Architecture Review
+Use the mcp__agent-mcp__agent_run tool to call the react-expert agent:
+- **Agent ID:** react-expert
+- **User Input:** "Review this code for React best practices, performance, and architecture: $ARGUMENTS. Point out issues and suggest improvements."
+- **Temperature:** 0.3
+
+Wait for the response, then proceed to Step 2.
+
+## Step 2: Test Coverage Analysis
+Use the mcp__agent-mcp__agent_run tool to call the test-gen agent:
+- **Agent ID:** test-gen
+- **User Input:** "Analyze test coverage for this code: $ARGUMENTS. What tests are missing? What edge cases aren't covered?"
+- **Temperature:** 0.3
+
+Wait for the response, then proceed to Step 3.
+
+## Step 3: Potential Bugs & Issues
+Use the mcp__agent-mcp__agent_run tool to call the debug-this agent:
+- **Agent ID:** debug-this
+- **User Input:** "Identify potential bugs, errors, or issues in this code: $ARGUMENTS. What could go wrong?"
+- **Temperature:** 0.3
+
+## Final Code Review Summary
+After all agents complete, provide:
+
+### 🎯 Overall Assessment
+- Code quality score (1-10)
+- Main strengths
+- Critical issues to fix
+
+### 🔧 Action Items (Prioritized)
+1. **Critical** - Must fix before merge
+2. **Important** - Should fix soon
+3. **Nice to have** - Optional improvements
+
+### ✅ What's Good
+- Highlight positive aspects
+- Good patterns to keep
+
+### 📝 Specific Recommendations
+- File by file improvements
+- Line-specific suggestions
+
+Present everything in a clean, structured format ready for a PR comment.
+CMDEOF
+success "  ✓ /code-review"
+
 # Step 3: Verify Installation
 log "Step 3/3: Verifying installation..."
 sleep 1
@@ -347,20 +510,26 @@ echo -e "${GREEN}📖 How to Use:${NC}"
 echo ""
 echo "1. ${YELLOW}Restart Claude Code${NC} (important!)"
 echo ""
-echo "2. Use these slash commands:"
-echo -e "   ${BLUE}/help${NC}                    - Show all agents with examples"
+echo "2. Single Agents:"
 echo -e "   ${BLUE}/react-expert${NC} <question> - React/TypeScript expert"
 echo -e "   ${BLUE}/sql-debug${NC} <query>      - SQL query optimizer"
 echo -e "   ${BLUE}/git-helper${NC} <question>  - Git commands & workflows"
 echo -e "   ${BLUE}/debug-this${NC} <error>     - Error message analyzer"
 echo -e "   ${BLUE}/test-gen${NC} <description> - Test generator"
+echo ""
+echo "3. Multi-Agent Workflows (NEW!):"
+echo -e "   ${BLUE}/build-feature${NC} <desc>   - Design → Code → Test → Git"
+echo -e "   ${BLUE}/debug-flow${NC} <issue>     - Analyze → Fix → Test → Commit"
+echo -e "   ${BLUE}/code-review${NC} <code>     - Architecture → Tests → Bugs"
+echo ""
+echo "4. Help Commands:"
+echo -e "   ${BLUE}/help${NC}                    - Show all agents with examples"
 echo -e "   ${BLUE}/agents${NC}                  - Quick list of all agents"
 echo ""
-echo "3. Try it:"
-echo -e "   ${BLUE}/help${NC}                                           - See everything"
-echo -e "   ${BLUE}/react-expert examples${NC}                          - See React examples"
-echo -e "   ${BLUE}/git-helper${NC} How do I undo my last commit?"
-echo -e "   ${BLUE}/debug-this${NC} TypeError: Cannot read property 'map' of undefined"
+echo "5. Try it:"
+echo -e "   ${BLUE}/build-feature${NC} User authentication with email/password"
+echo -e "   ${BLUE}/debug-flow${NC} TypeError: Cannot read property 'map' of undefined"
+echo -e "   ${BLUE}/code-review${NC} [paste your code here]"
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
