@@ -56,7 +56,7 @@ mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
   const tools: Tool[] = [
     {
       name: "agent_list",
-      description: "List all available AI agents with their metadata (excluding system prompts)",
+      description: "List all available AI agents",
       inputSchema: {
         type: "object",
         properties: {}
@@ -84,6 +84,39 @@ mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
           }
         },
         required: ["agent_id", "user_input"]
+      }
+    },
+    {
+      name: "agent_quickrun",
+      description: "Quick agent execution with smart defaults. Minimal args = cleaner UI. Use this for common tasks.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            description: "Agent ID (e.g., 'react-expert', 'sql-debug', 'git-helper')"
+          },
+          task: {
+            type: "string",
+            description: "Brief task description (keep under 200 chars for clean UI)",
+            maxLength: 500
+          }
+        },
+        required: ["id", "task"]
+      }
+    },
+    {
+      name: "agent_share",
+      description: "Get shareable install command for an agent",
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            description: "Agent ID to share"
+          }
+        },
+        required: ["id"]
       }
     }
   ];
@@ -148,6 +181,86 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
               version: agent.version,
               title: agent.title
             }
+          }, null, 2)
+        }]
+      };
+    }
+
+    if (name === "agent_quickrun") {
+      const { id, task } = args as { id: string; task: string };
+
+      // Enforce clean input limits
+      if (task.length > 500) {
+        return {
+          isError: true,
+          content: [{
+            type: "text",
+            text: "Task too long (>500 chars). Keep it brief for clean UI. Use agent_run for complex tasks."
+          }]
+        };
+      }
+
+      const agent = AGENTS.find((a) => a.id === id);
+      if (!agent) {
+        return {
+          isError: true,
+          content: [{
+            type: "text",
+            text: `Agent '${id}' not found. Available: ${AGENTS.map(a => a.id).join(', ')}`
+          }]
+        };
+      }
+
+      // Run with smart defaults
+      const cleanInput = preFilter(task);
+      const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+      const resp = await anthropic.messages.create({
+        model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        temperature: 0.2, // Smart default
+        messages: [{ role: 'user', content: cleanInput }],
+        system: agent.system,
+      });
+
+      const text = (resp.content?.[0] as any)?.text ?? '';
+      const filteredOutput = postFilter(text);
+
+      // Return concise result (no usage stats to reduce noise)
+      return {
+        content: [{
+          type: "text",
+          text: filteredOutput
+        }]
+      };
+    }
+
+    if (name === "agent_share") {
+      const { id } = args as { id: string };
+
+      const agent = AGENTS.find((a) => a.id === id);
+      if (!agent) {
+        return {
+          isError: true,
+          content: [{
+            type: "text",
+            text: `Agent '${id}' not found`
+          }]
+        };
+      }
+
+      const installCmd = `bash <(curl -fsSL https://agent-mcp-production.up.railway.app/install)`;
+
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({
+            agent: {
+              id: agent.id,
+              title: agent.title,
+              description: agent.desc
+            },
+            install: installCmd,
+            usage: `After install: "@${id} <your question>"`
           }, null, 2)
         }]
       };
