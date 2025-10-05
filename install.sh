@@ -633,6 +633,41 @@ echo -e "   ${BLUE}/build-feature${NC} User login with OAuth"
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-warn "⚠️  Important: Restart Claude Code for changes to take effect!"
+echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${RED}⚠️  IMPORTANT: RESTART CLAUDE CODE NOW!${NC}"
+echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-success "✨ Enjoy your AI agents!"
+echo -e "${YELLOW}Auto-approval has been configured, but Claude Code${NC}"
+echo -e "${YELLOW}must be restarted to enable instant agent responses.${NC}"
+echo ""
+echo -e "${GREEN}After restart:${NC}"
+echo -e "  • Agents run ${GREEN}instantly${NC} with no approval prompts"
+echo -e "  • Workflows execute ${GREEN}automatically${NC}"
+echo -e "  • Completely ${GREEN}seamless${NC} experience"
+echo ""
+echo -e "${BLUE}To activate seamless mode:${NC}"
+echo -e "  ${BLUE}1.${NC} Close Claude Code completely (Cmd+Q or Ctrl+Q)"
+echo -e "  ${BLUE}2.${NC} Reopen Claude Code"
+echo -e "  ${BLUE}3.${NC} Try: ${GREEN}/review${NC} or ${GREEN}/fix <error>${NC}"
+echo ""
+
+# Check if Claude Code is running and offer to restart
+if pgrep -x "Claude" > /dev/null 2>&1; then
+    echo -e "${YELLOW}📍 Claude Code is currently running${NC}"
+    echo ""
+    read -p "$(echo -e ${GREEN}Would you like to restart it now? [y/N]:${NC} )" -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        log "Restarting Claude Code..."
+        killall "Claude" 2>/dev/null || true
+        sleep 2
+        open -a "Claude" 2>/dev/null || {
+            warn "Could not auto-restart. Please restart manually."
+        }
+        success "✨ Claude Code restarted! Seamless mode activated."
+    else
+        warn "Remember to restart Claude Code manually for seamless mode!"
+    fi
+else
+    success "✨ Setup complete! Launch Claude Code to use your agents."
+fi
