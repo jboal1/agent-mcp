@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "mcp": "ts-node-dev --respawn src/mcp/server.ts",
     "mcp:sse": "ts-node-dev --respawn src/mcp/sse-server.ts",
-    "build": "tsc && mkdir -p dist/agents && cp src/agents/*.yaml dist/agents/ && cp install.sh dist/",
+    "build": "tsc && mkdir -p dist/agents && cp src/agents/*.yaml dist/agents/ && cp install.sh dist/ && cp USAGE.md dist/",
     "start": "node dist/server.js",
     "start:mcp": "node dist/mcp/server.js",
     "start:mcp:sse": "node dist/mcp/sse-server.js",

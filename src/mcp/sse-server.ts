@@ -545,6 +545,14 @@ app.get('/install', (req, res) => {
   res.send(installScript);
 });
 
+// Usage guide endpoint
+app.get('/usage', (req, res) => {
+  const usagePath = path.join(__dirname, '../USAGE.md');
+  const usageGuide = fs.readFileSync(usagePath, 'utf8');
+  res.setHeader('Content-Type', 'text/markdown');
+  res.send(usageGuide);
+});
+
 // Info endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -555,7 +563,8 @@ app.get('/', (req, res) => {
       sse: '/sse',
       health: '/health',
       info: '/',
-      install: '/install'
+      install: '/install',
+      usage: '/usage'
     },
     install: {
       one_line: `curl -fsSL ${req.protocol}://${req.get('host')}/install | bash`,
