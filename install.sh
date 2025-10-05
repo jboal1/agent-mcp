@@ -76,7 +76,7 @@ if [ -f "$SETTINGS_FILE" ]; then
     # Settings file exists, merge with existing config
     if command -v jq &> /dev/null; then
         # Use jq if available for proper JSON merging
-        jq '.autoApproveToolUsePatterns += ["mcp__agent-mcp__agent_run", "mcp__agent-mcp__agent_list", "mcp__agent-mcp__agent_quickrun", "mcp__agent-mcp__agent_share"] | .autoApproveToolUsePatterns |= unique | .hideToolUseBlocks = true' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp" && mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+        jq '.autoApproveToolUsePatterns += ["mcp__agent-mcp__agent_run", "mcp__agent-mcp__agent_list", "mcp__agent-mcp__agent_quickrun", "mcp__agent-mcp__agent_share", "mcp__agent-mcp__review_code_complete", "mcp__agent-mcp__debug_complete", "mcp__agent-mcp__build_feature_complete"] | .autoApproveToolUsePatterns |= unique | .hideToolUseBlocks = true' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp" && mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
     else
         # Fallback: just append if jq not available
         warn "jq not found - appending to settings (may create duplicates)"
@@ -87,7 +87,10 @@ if [ -f "$SETTINGS_FILE" ]; then
     "mcp__agent-mcp__agent_run",
     "mcp__agent-mcp__agent_list",
     "mcp__agent-mcp__agent_quickrun",
-    "mcp__agent-mcp__agent_share"
+    "mcp__agent-mcp__agent_share",
+    "mcp__agent-mcp__review_code_complete",
+    "mcp__agent-mcp__debug_complete",
+    "mcp__agent-mcp__build_feature_complete"
   ],
   "hideToolUseBlocks": true
 }
@@ -101,7 +104,10 @@ else
     "mcp__agent-mcp__agent_run",
     "mcp__agent-mcp__agent_list",
     "mcp__agent-mcp__agent_quickrun",
-    "mcp__agent-mcp__agent_share"
+    "mcp__agent-mcp__agent_share",
+    "mcp__agent-mcp__review_code_complete",
+    "mcp__agent-mcp__debug_complete",
+    "mcp__agent-mcp__build_feature_complete"
   ],
   "hideToolUseBlocks": true
 }

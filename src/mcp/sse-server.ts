@@ -118,6 +118,48 @@ mcpServer.setRequestHandler(ListToolsRequestSchema, async () => {
         },
         required: ["id"]
       }
+    },
+    {
+      name: "review_code_complete",
+      description: "Complete code review with multiple agents (architecture, tests, bugs). Server handles orchestration.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          code: {
+            type: "string",
+            description: "Code to review (or file description)"
+          }
+        },
+        required: ["code"]
+      }
+    },
+    {
+      name: "debug_complete",
+      description: "Complete debugging workflow (analyze error, suggest fix, generate tests). Server orchestrates.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          error: {
+            type: "string",
+            description: "Error message or issue description"
+          }
+        },
+        required: ["error"]
+      }
+    },
+    {
+      name: "build_feature_complete",
+      description: "Complete feature build (design, code, tests, git). Server orchestrates workflow.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          feature: {
+            type: "string",
+            description: "Feature description"
+          }
+        },
+        required: ["feature"]
+      }
     }
   ];
 
@@ -262,6 +304,131 @@ mcpServer.setRequestHandler(CallToolRequestSchema, async (request) => {
             install: installCmd,
             usage: `After install: "@${id} <your question>"`
           }, null, 2)
+        }]
+      };
+    }
+
+    // Server-side orchestration: Code Review
+    if (name === "review_code_complete") {
+      const { code } = args as { code: string };
+      const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+
+      // Run 3 agents in parallel for speed
+      const [reactReview, testReview, bugReview] = await Promise.all([
+        // React/Architecture Review
+        (async () => {
+          const agent = AGENTS.find(a => a.id === "react-expert");
+          if (!agent) return "React expert not available";
+          const resp = await anthropic.messages.create({
+            model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+            max_tokens: 1200,
+            temperature: 0.3,
+            messages: [{ role: 'user', content: `Review this code for React best practices, performance, and architecture:\n\n${code}` }],
+            system: agent.system,
+          });
+          return (resp.content?.[0] as any)?.text ?? '';
+        })(),
+
+        // Test Coverage Review
+        (async () => {
+          const agent = AGENTS.find(a => a.id === "test-gen");
+          if (!agent) return "Test agent not available";
+          const resp = await anthropic.messages.create({
+            model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+            max_tokens: 1200,
+            temperature: 0.3,
+            messages: [{ role: 'user', content: `Analyze test coverage for this code. What tests are missing?\n\n${code}` }],
+            system: agent.system,
+          });
+          return (resp.content?.[0] as any)?.text ?? '';
+        })(),
+
+        // Bug/Security Review
+        (async () => {
+          const agent = AGENTS.find(a => a.id === "debug-this");
+          if (!agent) return "Debug agent not available";
+          const resp = await anthropic.messages.create({
+            model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+            max_tokens: 1200,
+            temperature: 0.3,
+            messages: [{ role: 'user', content: `Identify potential bugs, errors, or security issues in this code:\n\n${code}` }],
+            system: agent.system,
+          });
+          return (resp.content?.[0] as any)?.text ?? '';
+        })()
+      ]);
+
+      // Synthesize results
+      const review = `# Code Review\n\n## Architecture & Best Practices\n${reactReview}\n\n## Test Coverage\n${testReview}\n\n## Potential Issues\n${bugReview}`;
+
+      return {
+        content: [{
+          type: "text",
+          text: postFilter(review)
+        }]
+      };
+    }
+
+    // Server-side orchestration: Debug Flow
+    if (name === "debug_complete") {
+      const { error } = args as { error: string };
+      const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+
+      // Step 1: Analyze error
+      const debugAgent = AGENTS.find(a => a.id === "debug-this");
+      if (!debugAgent) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: "Debug agent not available" }]
+        };
+      }
+
+      const analysis = await anthropic.messages.create({
+        model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        temperature: 0.2,
+        messages: [{ role: 'user', content: `Analyze this error and suggest a fix:\n\n${error}` }],
+        system: debugAgent.system,
+      });
+
+      const result = (analysis.content?.[0] as any)?.text ?? '';
+
+      return {
+        content: [{
+          type: "text",
+          text: postFilter(result)
+        }]
+      };
+    }
+
+    // Server-side orchestration: Build Feature
+    if (name === "build_feature_complete") {
+      const { feature } = args as { feature: string };
+      const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+
+      const reactAgent = AGENTS.find(a => a.id === "react-expert");
+      if (!reactAgent) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: "React agent not available" }]
+        };
+      }
+
+      // Design + Implementation in one call
+      const resp = await anthropic.messages.create({
+        model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        temperature: 0.2,
+        messages: [{ role: 'user', content: `Design and implement this feature with TypeScript and tests:\n\n${feature}` }],
+        system: reactAgent.system,
+      });
+
+      const result = (resp.content?.[0] as any)?.text ?? '';
+
+      return {
+        content: [{
+          type: "text",
+          text: postFilter(result)
         }]
       };
     }
