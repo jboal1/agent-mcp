@@ -491,6 +491,101 @@ Present everything in a clean, structured format ready for a PR comment.
 CMDEOF
 success "  ✓ /code-review"
 
+# Quick Review Command
+cat > "$COMMANDS_DIR/review.md" << 'CMDEOF'
+---
+description: Quick code review of current file or selection
+---
+
+## Instructions
+
+Review the code the user is currently working on:
+
+1. **Identify what to review:**
+   - If the user has text selected in the editor, review that
+   - If they mention a file path, read that file
+   - Otherwise, ask which file or code to review
+
+2. **Use the react-expert agent:**
+   Use the mcp__agent-mcp__agent_run tool:
+   - **Agent ID:** react-expert
+   - **User Input:** "Quick code review: analyze this code for issues, improvements, and best practices.\n\n[Code here with file path]"
+   - **Temperature:** 0.3
+
+3. **Provide concise output:**
+   - ✅ What's good
+   - ⚠️ Issues found (with line numbers)
+   - 💡 Quick wins (easy improvements)
+   - 🎯 Suggestions (bigger improvements)
+
+Keep it brief and actionable. Focus on the most important issues.
+CMDEOF
+success "  ✓ /review"
+
+# Fix Command
+cat > "$COMMANDS_DIR/fix.md" << 'CMDEOF'
+---
+description: Analyze and fix the current error or issue
+argument-hint: <error message or description>
+---
+
+## Instructions
+
+Help the user debug and fix an issue:
+
+1. **Understand the problem:**
+   - If $ARGUMENTS contains an error message, analyze it
+   - If it's vague, ask for the full error or stack trace
+   - Check if user has relevant files open (offer to read them)
+
+2. **Analyze with debug-this agent:**
+   Use the mcp__agent-mcp__agent_run tool:
+   - **Agent ID:** debug-this
+   - **User Input:** "Analyze and fix this issue: $ARGUMENTS\n\n[Include relevant code if available]"
+   - **Temperature:** 0.2
+
+3. **Provide the fix:**
+   - 🔍 Root cause (1-2 sentences)
+   - ✅ The fix (show exact code changes)
+   - 📝 Why it works (brief explanation)
+   - 🚀 How to prevent it (optional best practice)
+
+Be direct and actionable. Show them exactly what to change.
+CMDEOF
+success "  ✓ /fix"
+
+# Optimize Command
+cat > "$COMMANDS_DIR/optimize.md" << 'CMDEOF'
+---
+description: Optimize code for performance and best practices
+argument-hint: <file path or description>
+---
+
+## Instructions
+
+Help optimize the user's code:
+
+1. **Get the code:**
+   - If $ARGUMENTS is a file path, use Read tool to get it
+   - If user mentions specific code, get that context
+   - Otherwise ask what they want to optimize
+
+2. **Analyze with react-expert:**
+   Use the mcp__agent-mcp__agent_run tool:
+   - **Agent ID:** react-expert
+   - **User Input:** "Optimize this code for performance and best practices: $ARGUMENTS\n\n[Code with file path]"
+   - **Temperature:** 0.2
+
+3. **Provide optimizations:**
+   - 🎯 Performance issues found
+   - ⚡️ Optimized code (show the changes)
+   - 📊 Expected improvement
+   - 💡 Additional optimizations (optional)
+
+Focus on practical, measurable improvements.
+CMDEOF
+success "  ✓ /optimize"
+
 # Step 3: Verify Installation
 log "Step 3/3: Verifying installation..."
 sleep 1
@@ -510,26 +605,31 @@ echo -e "${GREEN}📖 How to Use:${NC}"
 echo ""
 echo "1. ${YELLOW}Restart Claude Code${NC} (important!)"
 echo ""
-echo "2. Single Agents:"
+echo "2. Quick Commands (Most Common):"
+echo -e "   ${BLUE}/review${NC}                  - Quick code review of current file"
+echo -e "   ${BLUE}/fix${NC} <error>             - Analyze and fix an error"
+echo -e "   ${BLUE}/optimize${NC} <file>         - Optimize code performance"
+echo ""
+echo "3. Multi-Agent Workflows:"
+echo -e "   ${BLUE}/build-feature${NC} <desc>   - Design → Code → Test → Git"
+echo -e "   ${BLUE}/debug-flow${NC} <issue>     - Analyze → Fix → Test → Commit"
+echo -e "   ${BLUE}/code-review${NC} <file>     - Comprehensive 3-agent review"
+echo ""
+echo "4. Individual Agents:"
 echo -e "   ${BLUE}/react-expert${NC} <question> - React/TypeScript expert"
 echo -e "   ${BLUE}/sql-debug${NC} <query>      - SQL query optimizer"
 echo -e "   ${BLUE}/git-helper${NC} <question>  - Git commands & workflows"
 echo -e "   ${BLUE}/debug-this${NC} <error>     - Error message analyzer"
 echo -e "   ${BLUE}/test-gen${NC} <description> - Test generator"
 echo ""
-echo "3. Multi-Agent Workflows (NEW!):"
-echo -e "   ${BLUE}/build-feature${NC} <desc>   - Design → Code → Test → Git"
-echo -e "   ${BLUE}/debug-flow${NC} <issue>     - Analyze → Fix → Test → Commit"
-echo -e "   ${BLUE}/code-review${NC} <code>     - Architecture → Tests → Bugs"
-echo ""
-echo "4. Help Commands:"
+echo "5. Help:"
 echo -e "   ${BLUE}/help${NC}                    - Show all agents with examples"
-echo -e "   ${BLUE}/agents${NC}                  - Quick list of all agents"
+echo -e "   ${BLUE}/agents${NC}                  - Quick list"
 echo ""
-echo "5. Try it:"
-echo -e "   ${BLUE}/build-feature${NC} User authentication with email/password"
-echo -e "   ${BLUE}/debug-flow${NC} TypeError: Cannot read property 'map' of undefined"
-echo -e "   ${BLUE}/code-review${NC} [paste your code here]"
+echo "6. Try it:"
+echo -e "   ${BLUE}/review${NC}                                 - Review current file"
+echo -e "   ${BLUE}/fix${NC} TypeError: Cannot read property 'map'"
+echo -e "   ${BLUE}/build-feature${NC} User login with OAuth"
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
